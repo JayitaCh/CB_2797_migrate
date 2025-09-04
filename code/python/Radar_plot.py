@@ -15,7 +15,7 @@ class Radar(object):
         for angle, label in zip(self.angles, title):
             angle_rad = np.deg2rad(angle)
             self.ax.text(
-                angle_rad, 14.0,  # outside the radar circle
+                angle_rad, 12.0,  # outside the radar circle
                 label,
                 ha='center',
                 va='center',
