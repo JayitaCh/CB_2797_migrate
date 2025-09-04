@@ -15,9 +15,13 @@ class Radar(object):
         for angle, label in zip(self.angles, title):
             angle_rad = np.deg2rad(angle)
             self.ax.text(
-                angle_rad, 12.0,  # outside the radar circle
+                angle_rad, 11.4,  # outside the radar circle
                 label,
-                ha='center',
+                ha=(
+                    "center" if angle in (90, 270)
+                    else "right" if 90 < angle < 270
+                    else "left"
+                ),
                 va='center',
                 fontsize=11,
                 fontname="DejaVu Sans",
@@ -33,10 +37,7 @@ class Radar(object):
 
         for ax, angle, label in zip(self.axes, self.angles, labels):
             ax.spines['polar'].set_color('black')
-            ax.spines['polar'].set_zorder(99)
-            # angle_deg = np.degrees(angle)
-            # ha = 'left' if 90 < angle_deg < 270 else 'right'
-            # ax.text(angle, ax.get_rmax() + 0.5, label, size=12, horizontalalignment=ha, verticalalignment='center')
+            ax.spines['polar'].set_zorder(99)            
                      
     def plot(self, values, *args, **kw):
         angle = np.deg2rad(np.r_[self.angles, self.angles[0]])
