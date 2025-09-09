@@ -26,6 +26,12 @@ window.dashExtensions = Object.assign({}, window.dashExtensions, {
         },
         function2: function(feature, layer) {
             layer.bindTooltip(feature.properties.tooltip);
+        },
+        function3: function(map, ctx) {
+            var leftLayer = ctx.refs.left;
+            var rightLayer = ctx.refs.right;
+            L.control.sideBySide(leftLayer, rightLayer).addTo(map);
         }
+
     }
 });
