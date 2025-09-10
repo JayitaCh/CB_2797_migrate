@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Side-by-Side Plugin CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-side-by-side@2.0.1/layout.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-side-by-side@2.0.1/range.css" />
+    <style>
+        #map { height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Side-by-Side Plugin JS -->
+    <script src="https://unpkg.com/leaflet-side-by-side@2.0.1/leaflet-side-by-side.min.js"></script>
+
+    <script>
+        // Define color mapping for categories
+        const categoryColors = {
+            "Q1: Low GP, High Police Calls": "#D55E00",
+            "Q2: High GP, High Police Calls": "#E69F00",
+            "Q3: High GP, Low Police Calls": "#0072B2",
+            "Q4: Low GP, Low Police Calls": "#009E73",
+            "Q5: Non-Significant":'#D3D3D3'
+        };
+
+        // Create the map
+        const map = L.map('map').setView([53.84471970863264, -1.854739199088332], 12);
+
+        // Add base tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Function to style features based on category
+        function styleleft(feature) {
+            const category = feature.properties.Quadrant;
+            return {
+                color: categoryColors[category] || "#888",
+                weight: 2,
+                fillOpacity: 0.6
+            };
+        }
+
+        function styleright(feature) {
+            const category = feature.properties.Quadrant_nw;
+            return {
+                color: categoryColors[category] || "#888",
+                weight: 2,
+                fillOpacity: 0.6
+            };
+        }
+
+        // Load left GeoJSON layer
+        const leftLayer = L.geoJson(null, {
+            style: styleleft,
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.Quadrant) {
+                    layer.bindPopup("Quadrant: " + feature.properties.Quadrant);
+                }
+            }
+        });
+
+        // Load right GeoJSON layer
+        const rightLayer = L.geoJson(null, {
+            style: styleright,
+            onEachFeature: function (feature, layer) {
+                if (feature.properties && feature.properties.Quadrant_nw) {
+                    layer.bindPopup("Quadrant: " + feature.properties.Quadrant_nw);
+                }
+            }
+        });
+
+        // Load external GeoJSON files
+        fetch('lsoa_quadrants.geojson')
+            .then(response => response.json())
+            .then(data => {
+                leftLayer.addData(data);
+                rightLayer.addData(data);
+                map.fitBounds(leftLayer.getBounds());
+            });
+
+        // Add side-by-side control
+        L.control.sideBySide(leftLayer, rightLayer).addTo(map);
+    </script>
+</body>
+</html>
